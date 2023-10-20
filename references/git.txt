@@ -1,0 +1,44 @@
+1. Common settings:
+Pycharm->File-> Settings-> Git-> check the "Use credentials helper"
+Pycharm->File-> Settings-> GitHub -> remove the old acc, add the new one
+
+to remove previous git credentials:
+Control Panel -> User Accounts -> Manage your credentials -> Windows Credentials
+
+Tokens to git:
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+
+
+2. Github atuh
+web: sign in to the github
+create new repository
+follow the instructions
+
+3. Copy the project
+git clone https://github.com/codingforentrepreneurs/recommender
+cd recommender
+git checkout start
+
+4. Delete previous (owners) git:
+go to the explorer
+properties -> additional -> make all visible
+delete the .git repository
+
+5. Push to my git:
+From the d:/projects/recommender repository in the terminal:
+
+git init .
+git add --all
+git commit -m "My recommender project"
+git branch -M main
+git remote add origin https://github.com/alandrest/cfe-recommender.git
+git push -u origin main
+
+may be will be required:
+git remote set-url origin https://<username>:<password>@github.com/<username>/FirstRepository.git
+
+
+to reinit the git:
+git remote remove origin
+
+

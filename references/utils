@@ -1,0 +1,45 @@
+1. Faked data:
+
+from faker import Faker
+fake = Faker()
+profile = fake.profile()
+
+2. Custom Django management command "loader":
+    The goal: to run form the terminal:
+        python .\manage.py loader --user --count 10
+
+    Create the app:
+        python .\manage.py startapp profiles
+
+    Update the settings.INSTALLED_APPS:
+        profiles
+
+    Create new dir under the profiles:
+        profiles [dir]
+            management [dir]
+                commands [dir]
+                    __init__.py
+                    loader.py ->> class Command
+                __init__.py
+
+    The it is seen at "python manage.py" in the list of all commands:
+        [profiles]
+            loader
+
+    class Command
+    --------------
+    from django.core.management.base import BaseCommand
+    from django.contrib.auth import get_user_model
+
+    class Command(BaseCommand):
+
+        # Adds arguments to the command.
+        def add_arguments(self, parser):
+            parser.add_argument("count", nargs='?', default=10, type=int)
+            parser.add_argument("--show-total", action='store_true', default=False)
+
+        def handle(self, *args, **options):
+            count = options.get('count')
+            show_total = options.get('show_total')
+            ...
+

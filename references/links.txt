@@ -1,0 +1,6 @@
+Course:
+
+Git repository:
+https://github.com/alandrest/cfe-recommender/blob/main/README.md
+
+

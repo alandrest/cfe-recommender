@@ -1,0 +1,16 @@
+Django -> ML Pipeline
+    - Get Data - by Django orchestration tools (Fake)
+        - [x] User
+        - [] Ratings -> Colaborative Filtering algorithm (ML)
+        - [] Dataset -> Movies
+            - Scrape from the internet (for example imdb)
+            - API service -> Software-to-Software
+            - User generated content -> cold start problem
+            - Open Source Datasets -> Kaggle -> The Movies Dataset
+    - Prepare Data - Django & pandas
+    - Train Model from Data
+            -> to orchestrate: Django & Celery
+                -> ml algs: Keras /PyTorch
+    - Use Model on New Data
+
+Cold Start Problem: (if no data - how to start?) - prepare faked data at the beginning
