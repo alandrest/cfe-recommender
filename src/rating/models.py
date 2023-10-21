@@ -2,6 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db.models import Avg
+from django.db.models.signals import post_save
+from django.utils import timezone
 
 User = settings.AUTH_USER_MODEL # 'auth.User'
 
@@ -22,6 +25,16 @@ class RatingChoice(models.IntegerChoices):
     FIVE = 5
     __empty__ = "Rate this"
 
+class RatingQuerySet(models.QuerySet):
+    def avg(self):
+        return self.aggregate(average=Avg('value'))['average'] # creates dict: {"average": 1.2}
+
+class RatingManager(models.Manager):
+    def get_queryset(self):
+        return RatingQuerySet(self.model, using=self._db)
+
+    def avg(self):
+        return self.get_queryset().avg()
 class Rating(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -33,6 +46,29 @@ class Rating(models.Model):
     content_object =GenericForeignKey("content_type", "object_id")
 
     active = models.BooleanField(default=True)
+    active_update_timestamp = models.DateTimeField(auto_now_add=False, auto_now=False, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
+    objects = RatingManager() # so we could do: Rating.objects.avg(), Rating.objects.all().avg()
+
+    class Meta:
+        ordering = ['-timestamp']
+
+# To prevent the same user+movie, both Rating's active.
+# Other way: after the creation to look for all the duplicates and to handle them.
+# But in production the best practice is: post signal (below) or override the save method.
+def rating_post_save(sender, instance, created, *args, **kwargs):
+    if created:
+        _id = instance.id
+        if instance.active:
+            qs = Rating.objects.filter(content_type=instance.content_type,
+                                       object_id=instance.object_id,
+                                       user=instance.user
+                                       ).exclude(id=_id, active=False)
+            if qs.exists():
+                qs.update(active=False, active_update_timestamp=timezone.now())
+                # Other decision: qs.delete()
+                # We are not deleting as we want the user's activity about changing their mind.
+
+post_save.connect(rating_post_save, sender=Rating)

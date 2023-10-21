@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Rating
 
 class RatingAdmin(admin.ModelAdmin):
+    list_display = ['content_object', 'user', 'value', 'active']
     raw_id_fields = ['user'] # search in separate window
     readonly_fields = ['content_object']
 
