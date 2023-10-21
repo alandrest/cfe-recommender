@@ -65,8 +65,11 @@ def rating_post_save(sender, instance, created, *args, **kwargs):
             qs = Rating.objects.filter(content_type=instance.content_type,
                                        object_id=instance.object_id,
                                        user=instance.user
-                                       ).exclude(id=_id, active=False)
+                                       ).exclude(id=_id, active=True)
             if qs.exists():
+                # Update only those whose timestamp is not set yet
+                # qs = qs.exclude(active_update_timestamp__isnull=False)
+
                 qs.update(active=False, active_update_timestamp=timezone.now())
                 # Other decision: qs.delete()
                 # We are not deleting as we want the user's activity about changing their mind.
