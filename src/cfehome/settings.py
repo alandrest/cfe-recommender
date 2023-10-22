@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     # internal apps
     'profiles',
     'movies',
-    'rating'
+    'rating',
+    # external apps
+    'django_celery_results', #scheduler
+    'django_celery_beat',   #saves our tasks results
 ]
 
 MIDDLEWARE = [
@@ -54,6 +57,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'cfehome.urls'
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_BROKER_URL = 'redis://localhost:1234'
+CELERY_RESULT_BACKEND = 'django-db'
+
 
 TEMPLATES = [
     {

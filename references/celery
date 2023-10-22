@@ -1,0 +1,51 @@
+1. Add celery.py next to the proj settings.py = declaration for celery; celery config gonna be at settings.py
+2. At the same folder update the __init__ file:
+    from .celery import app as celery_app
+    __all__ = ('celery_app',)
+3. Run the test from the terminal:
+    (venv) PS D:\projects\recommender\src>
+        celery -A cfehome worker
+        [result: "Cannot connect to amqp...", - ok]
+4. To allow the Celery to know abt Django: copy (before app=) from wsgi.py to the celery.py:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cfehome.settings')
+5. celery.py:
+    app.config_from_object("django.conf:settings",namespace = 'CELERY')
+    app.autodiscover_tasks()
+6. Run django + run celery: celery -A cfehome worker
+    => still error
+7.settings (1234 is gibrish =  some number no one is using):
+    CELERY_BROKER_URL = 'redis://localhost:1234'
+    + change the namespace to the WORKER in the celery.py:
+    CELERY_BROKER_URL: the first part of the var name is the same as namespace name at the celery.p
+
+    CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+    CELERY_BROKER_URL = 'redis://localhost:1234'
+    CELERY_RESULT_BACKEND = 'django-db'
+
+8. settings: INSTALLED_APPS: 'django_celery_results', 'django_celery_beat'
+    + python manage.py migrate
+9. Run (windows):
+        celery -A cfehome beat
+        => ok
+10. Handle port 1234:
+    Install REDIS
+
+
+Links:
+Celery + Redis + Django:
+https://www.codingforentrepreneurs.com/blog/celery-redis-django/
+
+Time & Tasks 2:
+https://www.codingforentrepreneurs.com/courses/time-tasks-2/
+
+Redis on Windows:
+https://www.codingforentrepreneurs.com/blog/redis-on-windows/
+
+Remote Redis Servers for Development:
+https://www.codingforentrepreneurs.com/blog/remote-redis-servers-for-development/
+
+
+
+
+
+
