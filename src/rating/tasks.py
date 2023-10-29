@@ -4,9 +4,11 @@ from django.contrib.contenttypes.models import ContentType
 
 from movies.models import Movie
 from .models import Rating, RatingChoice
+from celery import shared_task
 
 User = get_user_model()
 
+@shared_task(name='generate_fake_reviews')
 def generate_fake_reviews(count=10, users=10, null_avg=False):
     user_s = User.objects.first() # id=1
     user_e = User.objects.last()

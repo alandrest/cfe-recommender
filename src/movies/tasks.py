@@ -1,6 +1,21 @@
 from .models import Movie
+from celery import shared_task
 
+@shared_task(name='task_calculate_movie_ratings')
 def task_calculate_movie_ratings(all=False, count=None):
+    '''
+    Usage:
+         # direct call from cli
+         task_calculate_movie_ratings(all=False, count=None)
+         # celery_config tasks:
+            task_calculate_movie_ratings.delay(all=False, count=None)
+            task_calculate_movie_ratings.apply_async(
+                                                     kwargs={"all": False,
+                                                             "count": 12},
+                                                     countdown=30) # delay from running for 30 secs
+                                                                   # other option: inside the function time.sleep(30)
+                                                    )
+    '''
     qs = Movie.objects.needs_updating()
 
     if all:

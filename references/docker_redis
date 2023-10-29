@@ -1,0 +1,27 @@
+1. Copy next to the settings:
+   Dockerfile:
+    FROM redis
+    CMD [ "redis-server"]
+2. Run DockerDesktop
+3. Run from (venv) PS D:\projects\recommender\src>
+        docker build -t "cfe-redis" .
+        (create file build.ps1 with this command)
+4. Run the docker image:
+    docker run -it --rm -p 6380:6379 "cfe-redis"
+    (create file run.ps1 with this command)
+5. While it is running, in order to check it is valid, create next to the settings temp file ping_redis.py:
+    #ping_redis.py
+
+    import redis
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    setter = r.set('foo', 'bar')
+    getter = r.get('foo')
+
+    print(setter, getter)
+
+    And run from src dir:
+        python ping_redis.py
+
+        => True b'bar'
+6. Now, whenever you need to use redis in your projects. Just run:
+    docker run -it --rm -p 6380:6379 "cfe-redis"

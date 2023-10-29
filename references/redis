@@ -1,0 +1,19 @@
+Reference: https://redis.io/docs/install/install-redis/install-redis-on-windows/
+
+win cli: wsl
+
+from wsl:
+    curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+
+    echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+
+    sudo apt-get update
+    sudo apt-get install redis
+
+Start the redis:
+    sudo service redis-server start
+
+Connect to redis:
+    redis-cli
+        127.0.0.1:6379> ping
+        PONG

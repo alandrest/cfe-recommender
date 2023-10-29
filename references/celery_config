@@ -23,12 +23,18 @@
     CELERY_RESULT_BACKEND = 'django-db'
 
 8. settings: INSTALLED_APPS: 'django_celery_results', 'django_celery_beat'
-    + python manage.py migrate
+    + python manage.py migrate  !!!!!
+
 9. Run (windows):
         celery -A cfehome beat
         => ok
 10. Handle port 1234:
     Install REDIS
+
+
+References:
+1. Course, ch4: https://www.udemy.com/course/python-programming-build-a-recommendation-engine-in-django/learn/lecture/36301454#notes
+2. https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#django-celery-results-using-the-django-orm-cache-as-a-result-backend
 
 
 Links:
@@ -43,8 +49,6 @@ https://www.codingforentrepreneurs.com/blog/redis-on-windows/
 
 Remote Redis Servers for Development:
 https://www.codingforentrepreneurs.com/blog/remote-redis-servers-for-development/
-
-
 
 
 

@@ -1,0 +1,122 @@
+1. Celery
+2. Docker with redis
+3. Cre next to settings file .env
+
+    CELERY_BROKER_REDIS_URL = 'redis://localhost:6379'
+    DJANGO_DEBUG=1
+    SECRET_KEY='...'
+
+    6380 because of docker-compose.yaml (expose) =  6380
+    also if in terminal: "docker ps" => 6380
+
+    Secret key is taken from settings
+
+    also at the settings:
+        from decouple import config
+        DEBUG=config('DJANGO_DEBUG', default=0, cast=bool) # True/False
+
+    -> .env  fix:
+    SECRET_KEY = config('SECRET_KEY', default=None)
+    CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', default='redis://localhost:6379')
+
+4.1 Task function (tasks.py): @shared_task(name='task_calculate_movie_ratings')
+
+4.2. Next to settings, file celery.py with app.conf.beat_schedule:
+     app.conf.beat_schedule = {
+        "run_movie_rating_avg_every_30_mins":{... }}
+     =>> this will create a rec in the tab "periodic tasks": table "periodic tasks"
+     --- Note: instead of hardcoded config, you could create the rec manually
+4.3. Run in the terminal, src dir:
+    celery -A cfehome worker --beat
+
+    or:
+        celery -A cfehome  beat -l info
+        celery -A cfehome worker -l info
+
+========================= summary redis ======================
+Either through docker, either throug wsl
+
+1. wsl: see references/redis
+    Check in py console:
+        import redis
+        r = redis.Redis(host='localhost', port=6379, db=0)
+        setter = r.set('foo', 'bar')
+        getter = r.get('foo')
+        print(setter, getter)
+        True b'bar'
+
+2. docker: see references/docker_redis
+   docker run -it --rm -p 6380:6379 "cfe-redis"
+   validate in terminal:
+        docker ps
+        CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                    NAMES
+        f834d056878c   cfe-redis   "docker-entrypoint.s…"   18 seconds ago   Up 17 seconds   0.0.0.0:6380->6379/tcp   unruffled_wright
+    while the config for it:
+       .env: CELERY_BROKER_REDIS_URL = 'redis://localhost:6380'
+       .settings: CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL',  default='redis://localhost:6379')
+
+3. validate when running beat:
+    celery -A cfehome  beat -l info
+        Configuration ->
+            . broker -> redis://localhost:6380//
+    when running worker:
+         celery -A cfehome worker -l info
+            - ** ---------- .> transport:   redis://localhost:6380//
+
+
+
+
+
+=============================Summary declare and config =========
+
+Docker:
+    at src:
+        Dockerfile
+        .dockerignore
+
+Celery (next to redis run):
+
+    at cfehome:
+
+        settings.py
+        celery.py
+        __init__.py
+
+    at src:
+        .env
+
+======================= to run all (by scheduler) =============
+
+0. Run the app
+0. Run the redis (from wsl) -> 127.0.0.1:6379
+1. Run docker desktop
+2. From src dir (Activate the env):
+        docker build -t "cfe-redis" .
+        docker run -it --rm -p 6380:6379 "cfe-redis"
+3. Run celery from src dir:
+    celery -A cfehome  beat -l info
+    celery -A cfehome worker -l info
+4. See in db (admin): tab "periodic tasks": table "periodic tasks":
+        a rec for the task: "run_movie_rating_avg_every_30_mins"
+
+
+Note: it might be more than one instance of celery,
+       use it as distributed tasks q
+
+======================= to run manually =============
+
+1. Run the app
+2. from the src dir:
+    python manage.py shell
+3. Fom the shell:
+    from movies.tasks import task_calculate_movie_ratings
+     task_calculate_movie_ratings()
+
+     or:
+      task_calculate_movie_ratings().apply_async(countdown=10)
+
+================ results==============
+
+Celery periodic tasks: in db, tab: periodic tasks
+Celery results: in db, tab  celery results
+

@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from decouple import config # the way to load env vars; another one: python-dotenv
 from pathlib import Path
+
+DEBUG=config('DJANGO_DEBUG', default=0, cast=bool) # True/False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +23,10 @@ DATA_DIR = BASE_DIR / "data"
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=9ytf8+m@naq0lvq8*udwp=4j1fric%1hqtz0pxb-0z7lp+9q0'
+SECRET_KEY = config('SECRET_KEY', default=None)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -59,9 +62,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'cfehome.urls'
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
-CELERY_BROKER_URL = 'redis://localhost:1234'
+CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL',  default='redis://localhost:6379')
 CELERY_RESULT_BACKEND = 'django-db'
 
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_CACHE_BACKEND = 'django-cache'
 
 TEMPLATES = [
     {
