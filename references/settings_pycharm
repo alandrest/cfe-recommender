@@ -1,0 +1,19 @@
+Settings: Language& Frameworks: Django
+    django project root: D:\projects\recommender\src
+    env variables: DJANGO_SETTINGS_MODULE=cfehome.settings
+
+Build, execution, deployment -> Console -> python console:
+    env vars: DJANGO_SETTINGS_MODULE=cfehome.settings
+    interpreter: ...
+    starting script:
+        import sys; print('Python %s on %s' % (sys.version, sys.platform))
+        sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])
+    Django console:
+        interprete
+        script:
+            import sys; print('Python %s on %s' % (sys.version, sys.platform))
+            import django; print('Django %s' % django.get_version())
+            sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])
+            if 'setup' in dir(django): django.setup()
+            import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)
+

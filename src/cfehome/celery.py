@@ -16,15 +16,26 @@ app.config_from_object("django.conf:settings", namespace='CELERY')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    "run_movie_rating_avg_every_30_mins":{
-        # this is the name form D:\projects\recommender\src\movies\tasks.py, "@shared_task('task_calculate_movie_ratings')"
-        # if we would define it as: "@shared_task" then it should've been ike this:
-        # 'task': 'movies.tasks.task_calculate_movie_ratings'
-        'task': 'task_calculate_movie_ratings',
-
-        # 30 mins = 30*60 secs
-        'schedule': 30 * 60,
-
-        'kwargs': {"all": True}
-    }
+    "run_movie_rating_avg_every_30":{
+        'task': 'task_update_movie_ratings',
+        'schedule': 30 * 60, # 30 mins
+    },
+    # "add-every-30": {
+    #     'task': 'sum_two_numbers',
+    #     'schedule': 30,
+    #     'kwargs': {"x": 6, "y": 7}
+    # }
+    #
+    # celery -A cfehome worker -l info
+    # "run_movie_rating_avg_every_30_mins":{
+    #     # this is the name form D:\projects\recommender\src\movies\tasks.py, "@shared_task('task_calculate_movie_ratings')"
+    #     # if we would define it as: "@shared_task" then it should've been ike this:
+    #     # 'task': 'movies.tasks.task_calculate_movie_ratings'
+    #     'task': 'task_calculate_movie_ratings',
+    #
+    #     # 30 mins = 30*60 secs
+    #     'schedule': 30 * 60,
+    #
+    #     'kwargs': {"all": True}
+    # }
 }

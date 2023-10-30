@@ -1,0 +1,13 @@
+When changing some commands, destroy the redis instance:
+    docker compose down -v
+And then bring them up:
+    docker compose up -d
+
+Great reference: https://github.com/codingforentrepreneurs/Guides/blob/master/all/Celery_Redis_with_Django.md
+
+Rerun from src directory:
+    python .\manage.py runserver
+    docker compose down -v
+    docker run -it --rm -p 6380:6379 "cfe-redis"
+    celery -A cfehome beat -l info
+    celery -A cfehome worker -l info

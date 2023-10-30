@@ -39,4 +39,24 @@ def task_calculate_movie_rating_all():
 def task_calculate_movie_rating_needs_updating():
     qs = Movie.objects.needs_updating()
     for obj in qs:
+        # row by row
+        # SQL -> Aggregate, Group
         obj.calculate_rating(save=True)
+
+# # Debug
+# @shared_task(name="sum_two_numbers")
+# def add(x, y):
+#     # from rating.models import Rating
+#     # from django.contrib.auth import get_user_model
+#     # User = get_user_model()
+#     # rating_obj = Rating.objects.create(
+#     #     content_object=Movie.objects.first(),
+#     #     # content_type=movie_ctype,
+#     #     # object_id=movie.id,
+#     #     value=x+y,
+#     #     user= User.objects.first()
+#     # )
+#     print("**********************************************")
+#     print("              this is from the task           ")
+#     print("**********************************************")
+#     return x + y
