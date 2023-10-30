@@ -1,0 +1,46 @@
+References:
+1. https://docs.allauth.org/en/latest/
+   https://docs.allauth.org/en/latest/installation/quickstart.html#post-installation
+2. Course: https://www.udemy.com/course/python-programming-build-a-recommendation-engine-in-django/learn/lecture/36301498#notes
+    ch5, 18
+
+
+Settings:
+    INSTALLED:
+        'django.contrib.sites',
+        # external apps
+        'allauth',
+        'allauth.account',
+        'allauth.socialaccount',
+
+    SITE_ID = 1
+    LOGIN_URL = 'accounts/login/'
+    LOGIN_REDIRECT_URL = '/'
+    ACCOUNT_AUTHENTICATION = 'username'
+    ACCOUNT_EMAIL_VERIFICATION = None # for transactional emails
+
+    MIDDLEWARE:
+        'allauth.account.middleware.AccountMiddleware',
+
+
+    =>   python .\manage.py makemigrations
+         python .\manage.py migrate
+
+         ERRORS:
+            socialaccount.SocialAccount: (fields.E180) SQLite does not support JSONFields.
+            socialaccount.SocialApp: (fields.E180) SQLite does not support JSONFields.
+
+         Validating it is the same error:
+            import sqlite3
+            conn = sqlite3.connect(':memory:')
+            cursor = conn.cursor()
+            cursor.execute('SELECT JSON(\'{"a": "b"}\')')
+
+         [Happens to sqlite when python <3.9 ]
+
+         Reference to solve: https://code.djangoproject.com/wiki/JSON1Extension
+
+Auth templates:
+    Unix: venv/lib/allauth/templates: login.html, logout.html
+    Win: venv/site-packages/allauth/templates
+    Move all the "account" dir to our templates dir
