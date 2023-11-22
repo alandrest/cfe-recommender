@@ -1,0 +1,38 @@
+See celery_redis_progressbar project
+Need: redis, celery
+Source:
+    https://eeinte.ch/stream/progress-bar-django-using-celery/
+
+========================= Idea
+Background process = "worker"
+Celery: take a "work"in a queue; the worker pick it from there and executes it.
+Django client
+    -> work request to message broker (Redis or RabbitMQ)
+        - > work request to the Worker (Celery)
+            -> Track the work progress within the worker: by Observer design pattern
+               (one or more observers do something in response to state)
+               Here: the subject = worker process/function that is doing the work
+                     observer = the thing that is going to track the progress
+               -> Result backend (redis or rabbitmq) notified by Celery
+
+Use progress bar:
+    When your application first loads (if it takes a long time to load)
+    When processing a large data import
+    When preparing a file for download
+    When the user is in a queue waiting for their request to get processed
+
+=========================More sources:
+
+    https://fly.io/django-beats/celery-async-tasks-on-fly-machines/
+
+    Common:
+    https://buildwithdjango.com/blog/post/celery-progress-bars/
+    Code:
+    https://github.com/czue/celery-progress
+    Step-by-step:
+    https://eeinte.ch/stream/progress-bar-django-using-celery/
+
+    why we need flask, celery, redis?
+    https://ljvmiranda921.github.io/notebook/2019/11/08/flask-redis-celery-mcdo/
+
+=========================

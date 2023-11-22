@@ -1,0 +1,5 @@
+movies.models: import Ratings
+rating.models:
+    can not make import Ratings (circular import)
+        => from django.apps import apps
+           Movie = apps.get_model('movies', 'Movie')

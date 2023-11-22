@@ -1,0 +1,25 @@
+
+2. src/rating/context_processors.py:
+
+    def get_rating_choises(request):
+        return {
+            # this is the key used in template: {{ rating choises }}
+            "rating_choises": RatingChoice.values # choises: [(k, val)]
+        }
+
+3. settings:
+
+    TEMPLATES:
+        'rating.context_processors.get_rating_choises',
+
+4. templates/movies/snippet/card.html:
+
+    <select class="form-control">
+        {% for choise in rating_choises %}
+            {% if choise is None %}
+                <option disabled>Pick a choice</option>
+            {% else %}
+                <option value="{{ choise }}">{{ choise }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>

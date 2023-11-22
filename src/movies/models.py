@@ -8,20 +8,20 @@ import datetime
 
 RATING_CALC_TIME_IN_DAYS = 3
 
-class MovieQuerySet(models.QuerySet):
-    def needs_updating(self):
-        now = timezone.now()
-        days_ago = now - datetime.timedelta(days=RATING_CALC_TIME_IN_DAYS)
-        return self.filter(
-              Q(rating_last_updated__isnull=True) |
-              Q(rating_last_updated__lte=days_ago)
-        )
-class MovieManager(models.Manager):
-    def get_queryset(self, *args, **kwargs):
-        return MovieQuerySet(self.model, using=self._db)
-
-    def needs_updating(self):
-        return self.get_queryset().needs_updating()
+# class MovieQuerySet(models.QuerySet):
+#     def needs_updating(self):
+#         now = timezone.now()
+#         days_ago = now - datetime.timedelta(days=RATING_CALC_TIME_IN_DAYS)
+#         return self.filter(
+#               Q(rating_last_updated__isnull=True) |
+#               Q(rating_last_updated__lte=days_ago)
+#         )
+# class MovieManager(models.Manager):
+#     def get_queryset(self, *args, **kwargs):
+#         return MovieQuerySet(self.model, using=self._db)
+#
+#     def needs_updating(self):
+#         return self.get_queryset().needs_updating()
 
 class Movie(models.Model):
     title = models.CharField(max_length=120, unique=True)
@@ -34,12 +34,12 @@ class Movie(models.Model):
     rating_count = models.IntegerField(blank=True, null=True) # max = 5.00, min = 0.00 => max 4 digits
     rating_avg = models.DecimalField(decimal_places=2, max_digits=5, blank=True, null=True) # max = 5.00, min = 0.00 => max 4 digits
 
-    objects = MovieManager()
+    #objects = MovieManager()
 
     def __str__(self):
         if not self.release_date:
             return f'{self.title}'
-        return f'{self.title} ({self.release_date.year})'
+        return f'{self.id} {self.title} ({self.release_date.year})'
 
     def get_absolute_url(self):
         return f"/movies/{self.id}"

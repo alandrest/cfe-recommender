@@ -1,0 +1,101 @@
+
+===============================
+Making the celery working:
+1. upd env variable in pycharm (5)
+    FORKED_BY_MULTIPROCESSING=1
+2. pip install:
+    pip install gevent
+    pip install "celery[redis]"
+    pip install celery-progress
+3. run redis:
+    wsl
+    sudo service redis-server start
+3. run celery:
+    from src dir:
+        celery -A cfehome worker -l info -P gevent
+        celery beat in order to have tasks in db:
+
+pay attention to update the localhost:port at settings and .env file
+If using docker compose, use port 6380 (See docker-compose.yaml and make "docker ps" see the port)
+
+============= Redis in win
+
+Install redis for win:
+https://redis.io/docs/install/install-redis/install-redis-on-windows/
+1. install or enable wsl2: https://docs.microsoft.com/en-us/windows/wsl/install
+2. In Ubuntu on windows:
+cmd: wsl2 (as admin)
+lsb_release -a
+A+13
+
+    curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+
+    echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+
+    sudo apt-get update
+    sudo apt-get install redis
+
+Run redis:
+sudo service redis-server start
+
+Test:
+redis-cli
+=>
+127.0.0.1:6379> ping
+PONG
+127.0.0.1:6379>
+
+
+============== pycharm env vars
+
+1) In python console:
+Settings -> Build, Execution, Deployment -> COnsole -> Python Console + Django Console -> Environment variables
+Validate:
+    import os
+    print(os.environ['FORKED_BY_MULTIPROCESSING'])
+
+2) Run -> Edit configgurations -> choose conf -> env variable
+Validate -?
+
+
+3) Terminal:
+Settings -> Tools -> Terminal -> Env variables
+validate in Terminal:
+    echo $Env:FORKED_BY_MULTIPROCESSING
+
+4, 5) Settings -> Languages & Frameworks > Django > Environment variables
+Validate -?
+
+============= More ways for celery in win:
+
+1) older celery:
+    pip install celery==3.1.25
+
+or
+
+2) [gevent or pool solo] and FORKED_BY_MULTIPROCESSING=1
+    a. set the environment variable FORKED_BY_MULTIPROCESSING=1
+
+        b1. gevent:
+            pip install gevent
+            celery -A <module> worker -l info -P gevent
+            celery -A app_name_where_celery.py_configured worker -l info -P gevent
+    OR
+        b2. Pool:
+            celery -A your-application worker -l info --pool=solo
+
+            Source:
+                https://www.reddit.com/r/django/comments/z3drnz/alternative_for_django_celery/?rdt=38823&onetap_auto=true
+
+
+=============  Sources:
+
+cache by redis:
+https://fly.io/django-beats/caching-in-django-with-redis/
+(proj used: django imdb: https://github.com/katiayn/django-imdb/tree/caching-in-django-with-redis)
+
+htmx:
+https://fly.io/django-beats/a-no-js-solution-for-dynamic-search-in-django/
+
+Doc:
+https://docs.djangoproject.com/en/4.2/topics/cache/#redis

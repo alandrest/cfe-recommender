@@ -1,0 +1,31 @@
+use template tags or jinja
+
+if using jinja:
+    in the template:
+        {{ my_ratings[object.id] }}
+
+Build a filter to allow us to parse it -> templatetags dir under the rating
+
+1. cre templatetags with __init__ under  src/rating/
+src/rating/templatetags/get_dict_val.py:
+
+from django.template.defaulttags import register
+
+    @register.filter
+    def get_dict_val(dictionary, key, key_as_str=True):
+        if not isinstance(dictionary, dict):
+            return None
+        if key_as_str:
+            key = f"{key}"
+        return dictionary.get(key)
+
+2. settings:
+    TEMPLATES
+        'builtins': [
+                'rating.templatetags.get_dict_val',
+            ]
+
+3. html:
+{% load get_dict_val %}
+{{ my_ratings|get_dict_val:object.id }}
+

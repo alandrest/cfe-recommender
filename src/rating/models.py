@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models import Avg
 from django.db.models.signals import post_save
 from django.utils import timezone
+from django.apps import apps
 
 User = settings.AUTH_USER_MODEL # 'auth.User'
 
@@ -25,16 +26,33 @@ class RatingChoice(models.IntegerChoices):
     FIVE = 5
     __empty__ = "Rate this"
 
-class RatingQuerySet(models.QuerySet):
-    def avg(self):
-        return self.aggregate(average=Avg('value'))['average'] # creates dict: {"average": 1.2}
+# class RatingQuerySet(models.QuerySet):
+#     def avg(self):
+#         return self.aggregate(average=Avg('value'))['average'] # creates dict: {"average": 1.2}
+#
+#     def movies(self):
+#         Movie = apps.get_model('movies', 'Movie')
+#         ctype = ContentType.objects.get_for_model(Movie)
+#         return self.filter(active=True, content_type=ctype)
+#
+#     def as_object_dict(self, object_ids=None):
+#         if object_ids is not None:
+#             qs = self.filter(object_id__in=object_ids)
+#         else:
+#             qs = self.all()
+#
+#         return {f"{x.object_id}": x.value for x in qs}
+#
+# class RatingManager(models.Manager):
+#     def get_queryset(self):
+#         return RatingQuerySet(self.model, using=self._db)
+#
+#     def movies(self):
+#         return self.get_queryset().movies()
+#
+#     def avg(self):
+#         return self.get_queryset().avg()
 
-class RatingManager(models.Manager):
-    def get_queryset(self):
-        return RatingQuerySet(self.model, using=self._db)
-
-    def avg(self):
-        return self.get_queryset().avg()
 class Rating(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,7 +68,7 @@ class Rating(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
-    objects = RatingManager() # so we could do: Rating.objects.avg(), Rating.objects.all().avg()
+    #objects = RatingManager() # so we could do: Rating.objects.avg(), Rating.objects.all().avg()
 
     class Meta:
         ordering = ['-timestamp']

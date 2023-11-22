@@ -1,19 +1,57 @@
-Reference: https://github.com/codingforentrepreneurs/recommender/blob/main/celery_reference.md
+1. Define func (movies/tasks.py):
 
-Celery Reference
+    @shared_task(name='TASK_NAME')
+    def FUNC_NAME(params):
+        do_something
 
-Running Celery
+2. Schedule at celery.py:
 
-Worker-only
-    celery -A cfehome worker -l info
+    app.autodiscover_tasks()
 
-Beat-only (Scheduler-only)
-    celery -A cfehome beat -l info
+    Define tasks here or define it directly at the PERIODIC TASKS in the DB:
 
-Worker & Beat
-    celery -A cfehome worker -l info --beat
+        app.conf.beat_schedule = {
+            "func_name___every_x_mins":{
+                'task': 'TASK_NAME',
+                'schedule': x_mins * 60, # x mins
+                'kwargs': {"param_1": 6, "param_2": False},
+            },
+        }
 
-Using -l info is recommended in development, it's optional once in production.
+        if not mentioned task_name then use func_name with the full path like:
+            'task': 'movie.tasks.FUNC_NAME',
+
+3. See results (if running beat) at the DB:  "Celery results/Task results"
+
+==================
+
+Run:
+1. app
+2. redis
+3. celery
+4. celery beat
+
+===================
+
+When UPDATE the celery.py, restart the worker and beat
+
+When REMOVING the task, remember to remove it from the DB as well:
+"PERIODIC TASKS/Periodic tasks"
+
+MANUAL run of the task:
+from the python shell:
+    from movies.tasks import FUNC_NAME
+    FUNC_NAME()
+    or:
+    FUNC_NAME.delay()
+===============================
+
+Run MULTIPLE INSTANCES:
+
+In the terminal run another celery instance: worker
+
+
+===============================
 
 Turn Functions into Celery Tasks
     # myapp/tasks.py
@@ -52,3 +90,24 @@ Preferred Celery Call
 
     delay_seconds = 15
     my_function.apply_async(kwargs={"a": 456, "b": "Sweet", "c": False}, countdown=delay_seconds)
+
+=============================
+
+Celery common:
+Reference: https://github.com/codingforentrepreneurs/recommender/blob/main/celery_reference.md
+
+Celery Reference
+
+Running Celery
+
+Worker-only
+    celery -A cfehome worker -l info
+
+Beat-only (Scheduler-only)
+    celery -A cfehome beat -l info
+
+Worker & Beat
+    celery -A cfehome worker -l info --beat
+
+Using -l info is recommended in development, it's optional once in production.
+
