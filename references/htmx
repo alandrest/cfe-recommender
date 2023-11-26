@@ -20,7 +20,7 @@ Usage:
                 return ['movies/snippet/list.html']
             return ['movies/list-view.html']
 
-2. html:
+2. html sending GET:
    list-view:
         <select name='sort' class="form-control" hx-get="/movies/" hx-target="#target-list-change">
              <option>....
@@ -36,3 +36,13 @@ Usage:
                 {% include 'movies/snippet/card.html' with object=instance %}
             </div> <!-- end col -->
         {% endfor %}
+
+3. html sending POST:
+
+   base.html:
+        <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}" }'>
+
+   card.html, in the form:
+    <select class="form-control" hx-post>
+
+    <...>
