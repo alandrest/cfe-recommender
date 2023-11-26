@@ -1,0 +1,38 @@
+Installing:
+
+1. Take the cdn notation <script> from https://htmx.org/docs/ -> installing -> via cdn
+    To the base.html:
+     <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
+
+2. pip install django-htmx
+
+3. settings: installed apps: 'django_htmx'
+             middleware: 'django_htmx.middleware.HtmxMiddleware', # gives request.htmx
+
+
+Usage:
+
+1. view:
+   you can load different templates:
+       def get_template_names(self):
+            request = self.request
+            if request.htmx:
+                return ['movies/snippet/list.html']
+            return ['movies/list-view.html']
+
+2. html:
+   list-view:
+        <select name='sort' class="form-control" hx-get="/movies/" hx-target="#target-list-change">
+             <option>....
+        </select>
+
+        <div ... id="target-list-change">
+            {% include 'movies/snippet/list.html' with object_list=object_list %}
+        </div>
+
+   list:
+        {% for instance in object_list %}
+            <div class="col">
+                {% include 'movies/snippet/card.html' with object=instance %}
+            </div> <!-- end col -->
+        {% endfor %}
