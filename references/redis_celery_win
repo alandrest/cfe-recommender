@@ -8,14 +8,16 @@ Making the celery working:
     pip install "celery[redis]"
     pip install celery-progress
 3. run redis:
-    wsl
-    sudo service redis-server start
-3. run celery:
+    3.1 install wsl
+    3.2 from wsl shell:
+        sudo service redis-server start
+    3.3 update localhost:port for redis at settings.py and .env file.
+4. run celery:
     from src dir:
+        celery -A cfehome beat
         celery -A cfehome worker -l info -P gevent
-        celery beat in order to have tasks in db:
 
-pay attention to update the localhost:port at settings and .env file
+pay attention to update the localhost:port for redis at settings and .env file
 If using docker compose, use port 6380 (See docker-compose.yaml and make "docker ps" see the port)
 
 ============= Redis in win
