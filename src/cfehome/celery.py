@@ -16,11 +16,12 @@ app.config_from_object("django.conf:settings", namespace='CELERY')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    "generate_fake_review_every_1": {
-        'task': 'generate_fake_reviews',
-        'schedule': 1 * 60,  # 1 min
-        'kwargs': {"count": 1_000}
-    },
+    # "generate_fake_review_every_1_min": {
+    #     'task': 'generate_fake_reviews',
+    #     'schedule': 1 * 60,  # 1 min
+    #     'kwargs': {"count": 1_000}
+    # },
+
     # "run_movie_rating_avg_every_30":{
     #     'task': 'task_update_movie_ratings',
     #     'schedule': 30 * 60, # 30 mins
@@ -43,5 +44,12 @@ app.conf.beat_schedule = {
         'schedule': 30 * 60,
 
         'kwargs': {"all": True}
-    }
+    },
+
+    # the same name as defined at the @shared_task, see \src\exports\tasks.py
+    "export_rating_dataset_every_1_hour": {
+        'task': 'export_rating_dataset',
+        'schedule': 60 * 60,  # 1 hour
+    },
+
 }

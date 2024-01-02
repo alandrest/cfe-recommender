@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'profiles',
     'movies',
     'rating',
+    'exports',
 
     # external apps
     'allauth',
@@ -162,8 +163,7 @@ STATICFILES_DIRS = [
 ]
 
 # Media files configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'local-cdn' / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

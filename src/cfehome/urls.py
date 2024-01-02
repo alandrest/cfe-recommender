@@ -27,3 +27,4 @@ urlpatterns = [
     path('movies/', include('movies.urls')),
     path('rate/movie/', rating_views.rate_movie_view),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

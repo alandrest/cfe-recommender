@@ -111,3 +111,16 @@ Worker & Beat
 
 Using -l info is recommended in development, it's optional once in production.
 
+==================================
+Windows (from src dir):
+
+If celery.py changed:
+    - stop beat and workers
+    - cleanup db: Periodic tasks + "started" from celery_results.task_results
+    - rerun the redis
+
+1. Beat:
+    celery -A cfehome beat
+
+2. Worker:
+    celery -A cfehome worker -l info -P gevent
