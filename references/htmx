@@ -20,29 +20,150 @@ Usage:
                 return ['movies/snippet/list.html']
             return ['movies/list-view.html']
 
-2. html sending GET:
-   list-view:
-        <select name='sort' class="form-control" hx-get="/movies/" hx-target="#target-list-change">
+2. html sending GET
+   Action: Sort + htmx for re-sort the list
+
+   movies/list-view:
+        <-- the following is going for lookup movies whenever we are change the item
+        <select name='sort' class="form-control" hx-get="/movies/" hx-target="#target-list-change">  <-- here it might be: hx-get={{ request.path }} it is not recommended
              <option>....
         </select>
 
         <div ... id="target-list-change">
-            {% include 'movies/snippet/list.html' with object_list=object_list %}
+            {% include 'movies/snippet/list.html' with object_list=object_list %} <-- put it in separate snippet otherwise it looks weird after the refresh
         </div>
 
-   list:
+   movies/snippets/list:
         {% for instance in object_list %}
             <div class="col">
                 {% include 'movies/snippet/card.html' with object=instance %}
             </div> <!-- end col -->
         {% endfor %}
 
+   movies/view:
+       def get_template_names(self):
+            request = self.request
+            if request.htmx:
+                return ['movies/snippet/list.html']
+            return ['movies/list-view.html']
+
+       def get_queryset(self):
+            request = self.request
+            default_sort = request.session.get('movie_sort_order') or '-rating_avg'
+            qs = Movie.objects.all().order_by(default_sort)
+            sort = request.GET.get('sort')
+            if sort is not None:
+                request.session['movie_sort_order'] = sort
+                qs = qs.order_by(sort)
+            return qs
+
+
+
 3. html sending POST:
+   Select element into dynamic Rating form.
 
    base.html:
+   add a key that js will read directly:
+
         <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}" }'>
 
-   card.html, in the form:
-    <select class="form-control" hx-post>
+   movies/snippet/card.html, instead of the form:
 
-    <...>
+            <select class="form-control" hx-post>
+
+            <...>
+
+        make:
+
+            {% include 'ratings/snippet/rating-choices.html' with object_id=object.id current_rating=current_rating%}
+
+
+    ratings/snippet/rating-choices.html:
+    put select item into the snippet
+
+        <form hx-post="/rate/movie/" hx-trigger="change" hx-target="find .success">
+            <div class="success mb-2"></div>
+            {% if object_id %}
+                <input type="hidden" value="{{ object_id }}" name="object_id" />
+            {% endif %}
+
+            <select name="rating_value" class="form-control">
+
+                {% for choice in rating_choices %}
+                    ...
+                {% endfor %}
+
+            </select>
+        </form>
+
+       if anything in the form will be change (hx-trigger="change"),
+        it will automatically trigger the post-call for the "/rate/movie/"
+
+
+    rate/views/
+
+        @require_http_methods(['POST'])
+        def rate_movie_view(request):
+
+          if not request.htmx:
+              return HttpResponse("Not Allowed", status=400)
+
+
+          object_id = request.POST.get('object_id')
+          rating_value = request.POST.get('rating_value')
+          user = request.user
+
+          if object_id is None or rating_value is None:
+              # may be makes sense to log it that people do skip it a lot.
+              response = HttpResponse("Skipping", status=200)
+
+              # this is the trigger name which we could use somewhere else
+              # (see templates/movies/snippet/infinite.html)
+              response['HX-Trigger'] = 'did-skip-movie'
+
+              return response
+
+        ....
+
+    cfehome/urls:
+
+        from rating import views as rating_views
+
+        urlpatterns:
+
+            path('/rate/movie/', rating_view.rate_movie_view)
+
+4. Infinite refresh the page for the random movie (Rating):
+    skip and refresh by (swap:outer) itself
+
+   views (rating/views/rate_movie_view):
+        response['HX-Trigger'] = 'did-skip-movie'
+
+   catching it and refreshing by itself (but new id):
+    templates/movies/snippet/infinite.html:
+        <div hx-get="/movies/infinite/"
+             hx-trigger="did-skip-movie from:body"   <------ if getting in the header the did-skip-movie
+             hx-swap="outerHTML">  <------ refresh itself
+              {% include 'movies/snippet/card.html' with object=object skip=True %}
+        </div>
+
+        =>
+        [26/Nov/2023 18:51:00] "POST /rate/movie/ HTTP/1.1" 200 8
+        [26/Nov/2023 18:51:00] "GET /movies/infinite/ HTTP/1.1" 200 1823
+
+    to refresh after the giving a rating, add the same to the rating view when giving a rate:
+         if rating_obj.content_object is not None:
+              message = "<div class='bg-success text-light py-1 px-3 rounded'>Rating saved</div>"
+              response = HttpResponse("Skipping", status=200)
+
+              # this is the trigger name which we could use somewhere else
+              # (see templates/movies/snippet/infinite.html)
+              response['HX-Trigger-After-Settle'] = 'did-rate-movie'
+              return response
+
+    and use two triggers in the html:
+        <div hx-get="/movies/infinite/"
+             hx-trigger="did-skip-movie from:body, did-rate-movie from:body"
+             hx-swap="outerHTML">
+              {% include 'movies/snippet/card.html' with object=object skip=True %}
+        </div>

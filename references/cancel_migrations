@@ -1,0 +1,10 @@
+python manage.py showmigrations
+python manage.py migrate app_name zero
+--- delete migration files (except of __init__)
+python .\manage.py makemigrations
+python .\manage.py migrate
+
+
+if "Zero" option does not work:
+python .\manage.py flush
+python .\manage.py createsuperuser

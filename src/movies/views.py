@@ -61,3 +61,23 @@ class MovieDetailView(generic.DetailView):
 
 
 movie_detail_view = MovieDetailView.as_view()
+
+class MovieInfiniteRatingView(MovieDetailView):
+
+    # Order by "?" gives some random value: Movie.objects.all().order_by("?").first()
+    def get_object(self, queryset=None):
+        user = self.request.user
+        exclude_ids = []
+        if user.is_authenticated:
+            # Not efficient: each time lookup and filtering
+            exclude_ids = [x.object_id for x in user.rating_set.filter(active=True)]
+            # To make it more efficient: create a new model
+        return Movie.objects.all().exclude(id__in=exclude_ids).order_by("?").first()
+
+    def get_template_names(self):
+        request = self.request
+        if request.htmx:
+            return ['movies/snippet/infinite.html']
+        return ['movies/infinite-view.html']
+
+movie_inifinite_rating_view = MovieInfiniteRatingView.as_view()

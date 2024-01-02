@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rating import views as rating_views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('movies/', include('movies.urls')),
-    path('rate/movie/', rating_views.rate_movie_view)
-]
+    path('rate/movie/', rating_views.rate_movie_view),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
