@@ -1,0 +1,40 @@
+1. Create new file: requirement.ml.txt
+2. Create the dir src/nbs for the notebooks
+    nbs/
+        setup_django.py <---did not work
+
+3. In the terminal:
+        cd src
+        jupyter notebook
+
+   this opens the jupyter notebook server (browser, takes abt the min): http://localhost:8888/tree
+   This shows all the files/dirs from the parent dir (one above from cfehome)
+   In the terminal we got the urls:
+
+            To access the server, open this file in a browser:
+                file:///C:/Users/Sasha/AppData/Roaming/jupyter/runtime/jpserver-1208-open.html
+            Or copy and paste one of these URLs:
+                http://localhost:8888/tree?token=e120a1aab01cb53bcc73fa447164f09bd312327ae995d641
+                http://127.0.0.1:8888/tree?token=e120a1aab01cb53bcc73fa447164f09bd312327ae995d641
+
+   Either in the first cell:
+
+        import setup_django
+        setup_django.init()
+
+   Either:
+
+        import os, sys
+        import django
+        PROJECTPATH = 'D:\\projects\\recommender\\src'
+        sys.path.insert(0, PROJECTPATH)
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cfehome.settings")
+        os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # https://docs.djangoproject.com/en/4.1/topics/async/#async-safety
+        os.chdir(PROJECTPATH)
+        django.setup()
+
+4. To run the cell:
+        button Run
+        shift + Enter
+   To run all:
+        Kernel -> Restart Kernel
